@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  # Streamlit Service
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile-streamlit
+    ports:
+      - "8501:8501"  # Expose Streamlit app on port 8501
+    networks:
+      - webnet
+
+  # Nginx Service
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "80:80"  # Expose Nginx on port 80
+    volumes:
+      - ./html/nginx/default.conf:/etc/nginx/conf.d/default.conf  # Mount the Nginx config file
+    depends_on:
+      - streamlit  # Ensure Streamlit is started before Nginx
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    driver: bridge
+
