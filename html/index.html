@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Transparent fixed overlay covering the entire screen */
+        #transparant-cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            /* background: rgba(160, 179, 20, 0.511);  Semi-transparent */
+            display: block;  /* Hidden by default */
+            z-index: 99;  /* Ensure it's on top of all other elements */
+        }
+
+          /* Modal styles */
+        #modal-transparant-cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(35, 35, 35, 0.378);  /* Semi-transparent */
+            display: block;  /* Hidden by default */
+            z-index: -1;  /* Ensure it's on top of all other elements */
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);  /* Slightly lighter overlay */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;  /* Smooth transition for modal appearance */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;  /* Rounded corners for a smoother look */
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+            transform: translateY(-50px);  /* Initial position for smooth animation */
+            opacity: 0;
+            animation: modalShow 0.3s forwards;  /* Smooth fade-in and slide-up effect */
+        }
+
+        @keyframes modalShow {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;  /* Modern font */
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 6px;  /* Slightly rounded corners */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;  /* Smooth hover effect */
+        }
+
+        .button:hover {
+            transform: scale(1.05);  /* Subtle hover animation */
+        }
+
+        .button-yes {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .button-no {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .button-yes:hover {
+            background-color: #45a049;
+        }
+
+        .button-no:hover {
+            background-color: #e53935;
+        }
+        
+          /* Modal styles */
+    </style>
+  
+</head>
+<body style="width: 100vw; height: 100vh; margin:0; padding:0;">
+    <!-- COVER -->
+    <div id="transparant-cover"></div>
+    <!-- COVER -->
+
+    <!-- CONFIRMATION BOX -->
+    <div id="customConfirm" class="modal">
+        <div class="modal-content">
+            <h2>Apakah anda masih ingin melanjutkan percakapan?</h2>
+            <div class="button-group">
+                <button class="button button-yes" onclick="confirmAction(true)">Lanjutkan</button>
+                <button class="button button-no" onclick="confirmAction(false)">Keluar</button>
+            </div>
+        </div>
+        <div id="modal-transparant-cover"></div>
+    </div>
+    <!-- CONFIRMATION BOX -->
+    <iframe id="my-iframe" style="width: 100%; height: 100%; margin:0; padding:0;" frameborder="0"></iframe>
+</body>
+<script>
+    let inactivityTimer, popupTimer, refreshTimer;
+    const TIMEOUT_DURATION = 10000; // 1 minute in milliseconds
+    const TIMEOUT_DURATION_POPUP = 60000; // 1 minute in milliseconds
+    const TIMEOUT_DURATION_REFRESH = 30000; // 1 minute in milliseconds
+    let transparantCover = document.getElementById('transparant-cover');
+
+    function showConfirm() {
+        document.getElementById("customConfirm").style.display = "flex";
+    }
+
+    function confirmAction(choice) {
+        document.getElementById("customConfirm").style.display = "none";
+        if (choice) {
+            console.log("User chose: Iya");
+            resetInactivityTimer()
+        } else {
+            console.log("User chose: Tidak");
+            window.location.reload();
+        }
+    }
+
+    // Function to show the transparent cover
+    async function showCover() {
+        transparantCover.style.display = 'block';
+        popupTimer = await setTimeout(showPopup, TIMEOUT_DURATION_POPUP);
+    }
+
+    async function showPopup() {
+        showConfirm()
+        refreshTimer = await setTimeout(()=>{setTimeout(()=>{window.location.reload()},TIMEOUT_DURATION_REFRESH)}, 1);
+    }
+    // Function to hide the transparent cover
+    function hideCover() {
+        transparantCover.style.display = 'none';
+    }
+
+    // Reset the inactivity timer (called whenever there's user interaction)
+    async function resetInactivityTimer() {
+        hideCover();  // Hide the cover immediately when user interacts
+        clearTimeout(inactivityTimer);
+        clearTimeout(popupTimer);
+        clearTimeout(refreshTimer);
+        inactivityTimer = await setTimeout(showCover, TIMEOUT_DURATION); // Show cover after timeout
+    }
+
+    async function getClientIP() {
+        try {
+            const iframe = document.getElementById('my-iframe');
+            iframe.src = `/chatbot/iframe.html`;
+        } catch (error) {
+            console.error('Error fetching IP:', error);
+        }
+    }
+
+
+    window.onload = async () => {
+        getClientIP();
+        // inactivityTimer = await setTimeout(showCover, TIMEOUT_DURATION_FIRST_TIME);
+
+    }
+    // document.addEventListener('click', resetInactivityTimer);
+    // document.addEventListener('keydown', resetInactivityTimer);
+    // document.addEventListener('mousemove', resetInactivityTimer);
+    // document.addEventListener('mousedown', resetInactivityTimer); 
+    transparantCover.addEventListener('click', resetInactivityTimer);
+    transparantCover.addEventListener('keydown', resetInactivityTimer);
+    transparantCover.addEventListener('mousemove', resetInactivityTimer);
+    transparantCover.addEventListener('mousedown', resetInactivityTimer); 
+
+</script>
+</html>
+
+
