@@ -15,7 +15,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-import logging
+# import logging
 import datetime
 import threading
 
@@ -108,34 +108,34 @@ def insert_log_data(log_data):
 
 
 # Logging setup
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 
 # Function to update the log handler daily (interval-based)
-def update_log_handler(logger):
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"{current_date}.log"  # Log file format YYYY-MM-DD.log
+# def update_log_handler(logger):
+#     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+#     log_filename = f"{current_date}.log"  # Log file format YYYY-MM-DD.log
 
-    # Create a new file handler for the current day
-    file_handler = logging.FileHandler(log_filename, mode="a")
-    file_handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    file_handler.setFormatter(formatter)
+#     # Create a new file handler for the current day
+#     file_handler = logging.FileHandler(log_filename, mode="a")
+#     file_handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter(
+#         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+#     )
+#     file_handler.setFormatter(formatter)
 
-    # Clear existing handlers and set the new handler
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    logger.addHandler(file_handler)
+#     # Clear existing handlers and set the new handler
+#     if logger.hasHandlers():
+#         logger.handlers.clear()
+#     logger.addHandler(file_handler)
 
 
 # Function to rotate log files at midnight daily using interval
 def rotate_log_files():
     while True:
         # Update the log file handler at the start
-        update_log_handler(logger)
+        # update_log_handler(logger)
 
         # Calculate the time until the next midnight
         now = datetime.datetime.now()

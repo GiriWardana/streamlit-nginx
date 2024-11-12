@@ -3,9 +3,10 @@ FROM nginx:alpine
 
 # Copy the static HTML files into the container
 COPY html /usr/share/nginx/html
+# COPY redirect /usr/share/nginx/redirect
 
 # Expose port 80 for Nginx
-EXPOSE 80
+EXPOSE 8088 8081
 
 # No need to explicitly specify a command, Nginx will start automatically
 
