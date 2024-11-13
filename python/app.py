@@ -244,7 +244,7 @@ key = os.getenv("OPENAI_API_KEY")
 assistant_id = os.getenv("ASSISTANT_ID")
 vect_id = os.getenv("VECTOR_STORE_ID")
 
-client = OpenAI(api_key=key)
+client = OpenAI(api_key=key, timeout=999999999)
 
 assistant = client.beta.assistants.update(
     assistant_id=assistant_id,
